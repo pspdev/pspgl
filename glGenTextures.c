@@ -29,6 +29,6 @@ void glGenTextures (GLsizei n, GLuint *textures)
 	return;
 
   out_error:
-	GLERROR(error);
+	GLERROR(GL_INVALID_VALUE);
 }
 

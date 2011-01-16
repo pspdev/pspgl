@@ -37,7 +37,10 @@ void glVertex3f (GLfloat x, GLfloat y, GLfloat z)
 		memcpy(&c->beginend.line_loop_start, vbuf, sizeof(*vbuf));
 	}
 
-	if (unlikely(++c->beginend.vertex_count == BUFSZ)) {
+	c->beginend.vertex_count++;
+
+	if (unlikely(c->beginend.vertex_count == BUFSZ)
+	 || unlikely(c->beginend.primitive == GL_QUADS && c->beginend.vertex_count == 4)) {
 		static const char overhang_count [] = {
 			0,	/* GL_POINTS */
 			0,	/* GL_LINES */
@@ -46,8 +49,8 @@ void glVertex3f (GLfloat x, GLfloat y, GLfloat z)
 			0,	/* GL_TRIANGLES */
 			2,	/* GL_TRIANGLE_STRIP */
 			2,	/* GL_TRIANGLE_FAN */
-			1,	/* GL_QUADS (really trifan) */
-			1,	/* GL_QUAD_STRIP (really trifan) */
+			0,	/* GL_QUADS (really trifan) */
+			2,	/* GL_QUAD_STRIP (really tristrip) */
 			1,	/* GL_POLYGON (really trifan) */
 			0	/* GL_SPRITES_PSP */
 		};
