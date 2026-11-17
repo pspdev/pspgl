@@ -65,6 +65,16 @@ EGLBoolean eglMakeCurrent (EGLDisplay dpy,
 			c->bone_stacks[i].flags |= MF_DIRTY;
 	}
 
-	return __pspgl_vidmem_setup_write_and_display_buffer(c->draw);
+	if (!__pspgl_vidmem_setup_write_and_display_buffer(c->draw))
+		return EGL_FALSE;
+
+	/* The GE clipping registers depend on the active draw surface.
+	 * Restore them even if the GL context itself did not change. */
+	sendCommandi(CMD_REGION1, 0);
+	sendCommandi(CMD_REGION2,
+		     ((c->draw->height - 1) << 10) | (c->draw->width - 1));
+	__pspgl_set_scissor();
+
+	return EGL_TRUE;
 }
 
