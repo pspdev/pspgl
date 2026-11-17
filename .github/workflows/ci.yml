@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ghcr.io/pspdev/pspsdk:latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install image conversion dependency
+        run: apk add --no-cache imagemagick
+
+      - name: Install PSP libpng
+        run: psp-pacman -Sy --noconfirm libpng
+
+      - name: Build PSPGL
+        run: make -j "$(getconf _NPROCESSORS_ONLN)"
+
+      - name: Build regular tests
+        run: make -C tests -j "$(getconf _NPROCESSORS_ONLN)"
